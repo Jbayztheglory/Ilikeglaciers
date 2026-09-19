@@ -1187,7 +1187,7 @@ end
 
 -- Scripts:
 
-local function HYJPTO_fake_script() -- Annc.LocalScript 
+local function LJAWUQ_fake_script() -- Annc.LocalScript 
 	local script = Instance.new('LocalScript', Annc)
 	local req = require
 	local require = function(obj)
@@ -1220,8 +1220,8 @@ local function HYJPTO_fake_script() -- Annc.LocalScript
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(HYJPTO_fake_script)()
-local function JJPXGHV_fake_script() -- Main.SmoothDrag 
+coroutine.wrap(LJAWUQ_fake_script)()
+local function ZTSNCR_fake_script() -- Main.SmoothDrag 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1302,8 +1302,8 @@ local function JJPXGHV_fake_script() -- Main.SmoothDrag
 		main.Position = currentPosition
 	end)
 end
-coroutine.wrap(JJPXGHV_fake_script)()
-local function OOGTWZF_fake_script() -- Main.UIDisclose 
+coroutine.wrap(ZTSNCR_fake_script)()
+local function CMJZVNT_fake_script() -- Main.UIDisclose 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1558,8 +1558,8 @@ local function OOGTWZF_fake_script() -- Main.UIDisclose
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(OOGTWZF_fake_script)()
-local function KQZYJ_fake_script() -- Main.Main.luau 
+coroutine.wrap(CMJZVNT_fake_script)()
+local function JUGU_fake_script() -- Main.Main.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1680,8 +1680,8 @@ local function KQZYJ_fake_script() -- Main.Main.luau
 		purge = purgeDuplicates,
 	}
 end
-coroutine.wrap(KQZYJ_fake_script)()
-local function NLZI_fake_script() -- Main.Bootstrap.luau 
+coroutine.wrap(JUGU_fake_script)()
+local function DEMTGFO_fake_script() -- Main.Bootstrap.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1813,202 +1813,113 @@ local function NLZI_fake_script() -- Main.Bootstrap.luau
 		end,
 	})
 	
-	Manager:CreateToggle({
-		Menu = "Voertuig",
-		Name = "Car Fly",
-		Default = false,
-		Callback = function(state)
-			local Players     = game:GetService("Players")
-			local RunService  = game:GetService("RunService")
-			local LocalPlayer = Players.LocalPlayer
+	-- =========================================================
+	--  WAPEN — ACS Settings Mods
+	-- =========================================================
+	local function getActiveACS()
+		local plr = game.Players.LocalPlayer
+		local char = plr.Character
+		local tool = char and char:FindFirstChildWhichIsA("Tool") or plr.Backpack:FindFirstChildWhichIsA("Tool")
+		if not tool then return nil end
 	
-			-- Keep a reference to the running loop so we can stop it later
-			if _G.__GlacierCarFly then
-				_G.__GlacierCarFly.enabled = state
-				if not state and _G.__GlacierCarFly.cleanup then
-					_G.__GlacierCarFly.cleanup()
-				end
-				return
+		local settingsMod = tool:FindFirstChild("ACS_Settings")
+		if settingsMod and settingsMod:IsA("ModuleScript") then
+			local success, data = pcall(require, settingsMod)
+			if success and type(data) == "table" then
+				return data
 			end
+		end
+		return nil
+	end
 	
-			local function getPlayerCar(plrName)
-				local spelers = workspace:FindFirstChild("Spelers")
-				if not spelers then return nil end
-				local plrFolder = spelers:FindFirstChild(plrName)
-				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Voertuig")
-				if not autoFolder then return nil end
-				return autoFolder:GetChildren()[1]
+	Manager:CreateSlider({
+		Menu = "Wapen",
+		Name = "Fire Rate (RPM)",
+		Min = 100, Max = 3000, Default = 700, Increment = 50,
+		Callback = function(v)
+			local settings = getActiveACS()
+			if settings then
+				settings.ShootRate = v
 			end
-	
-			-- Find the car's primary drive part (works with A-Chassis)
-			local function getDrivePart(car)
-				if not car then return nil end
-	
-				-- Prefer the chassis root
-				local root = car:FindFirstChild("DriveSeat") or car:FindFirstChild("VehicleSeat")
-				if root then return root end
-	
-				-- Fall back to the PrimaryPart
-				if car.PrimaryPart then return car.PrimaryPart end
-	
-				-- Last resort: first BasePart
-				for _, obj in ipairs(car:GetDescendants()) do
-					if obj:IsA("BasePart") and obj.Name:lower():find("chassis") then
-						return obj
-					end
-				end
-	
-				for _, obj in ipairs(car:GetDescendants()) do
-					if obj:IsA("BasePart") then return obj end
-				end
-				return nil
-			end
-	
-			local flyData = { enabled = state, bodyVel = nil, bodyGyro = nil, connection = nil }
-			_G.__GlacierCarFly = flyData
-	
-			-- Cleanup removes forces and stops the loop
-			flyData.cleanup = function()
-				if flyData.bodyVel then flyData.bodyVel:Destroy() flyData.bodyVel = nil end
-				if flyData.bodyGyro then flyData.bodyGyro:Destroy() flyData.bodyGyro = nil end
-				if flyData.connection then flyData.connection:Disconnect() flyData.connection = nil end
-				_G.__GlacierCarFly = nil
-			end
-	
-			local car  = getPlayerCar(LocalPlayer.Name)
-			local part = getDrivePart(car)
-	
-			if not part then
-				warn("[Voertuig] Geen auto om te laten vliegen.")
-				flyData.cleanup()
-				return
-			end
-	
-			-- Create the forces
-			local bv = Instance.new("BodyVelocity")
-			bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-			bv.Velocity = Vector3.zero
-			bv.P = 1250
-			bv.Parent   = part
-	
-			local bg = Instance.new("BodyGyro")
-			bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-			bg.P = 3000
-			bg.D = 50
-			bg.CFrame = part.CFrame
-			bg.Parent   = part
-	
-			flyData.bodyVel  = bv
-			flyData.bodyGyro = bg
-	
-			local UserInputService = game:GetService("UserInputService")
-			local camera = workspace.CurrentCamera
-	
-			local speed = 120
-	
-			flyData.connection = RunService.RenderStepped:Connect(function()
-				if not flyData.enabled then return end
-				if not part or not part.Parent then
-					flyData.cleanup()
-					return
-				end
-	
-				-- Camera-relative direction
-				local look = camera.CFrame.LookVector
-				local right = camera.CFrame.RightVector
-	
-				local move = Vector3.zero
-	
-				if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += look end
-				if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= look end
-				if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += right end
-				if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= right end
-				if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move += Vector3.new(0, 1, 0) end
-				if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then move -= Vector3.new(0, 1, 0) end
-	
-				if move.Magnitude > 0 then
-					move = move.Unit * speed
-				end
-	
-				bv.Velocity = move
-				bg.CFrame = CFrame.new(part.Position, part.Position + camera.CFrame.LookVector)
-			end)
 		end,
 	})
 	
-	Manager:CreateButton({
-		Menu = "Voertuig",
-		Name = "Bring Car",
-		Callback = function()
-			local Players     = game:GetService("Players")
-			local LocalPlayer = Players.LocalPlayer
-	
-			local function getPlayerCar(plrName)
-				local spelers = workspace:FindFirstChild("Spelers")
-				if not spelers then return nil end
-				local plrFolder = spelers:FindFirstChild(plrName)
-				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Voertuig")
-				if not autoFolder then return nil end
-				return autoFolder:GetChildren()[1]
+	Manager:CreateSlider({
+		Menu = "Wapen",
+		Name = "Magazine Ammo",
+		Min = 1, Max = 500, Default = 30, Increment = 1,
+		Callback = function(v)
+			local settings = getActiveACS()
+			if settings then
+				settings.Ammo = v
+				settings.AmmoInGun = v
 			end
+		end,
+	})
 	
-			local car = getPlayerCar(LocalPlayer.Name)
-			if not car then
-				warn("[Voertuig] Geen auto gevonden.")
-				return
+	Manager:CreateSlider({
+		Menu = "Wapen",
+		Name = "Bullet Penetration",
+		Min = 0, Max = 500, Default = 50, Increment = 5,
+		Callback = function(v)
+			local settings = getActiveACS()
+			if settings then
+				settings.BulletPenetration = v
 			end
+		end,
+	})
 	
-			local char = LocalPlayer.Character
-			local root = char and char:FindFirstChild("HumanoidRootPart")
-			if not root then
-				warn("[Voertuig] Geen character.")
-				return
-			end
-	
-			-- Find the drive seat
-			local driveSeat = car:FindFirstChild("DriveSeat")
-				or car:FindFirstChild("VehicleSeat")
-				or car:FindFirstChildWhichIsA("VehicleSeat")
-	
-			if not driveSeat then
-				-- Fall back: any seat in the car
-				for _, obj in ipairs(car:GetDescendants()) do
-					if obj:IsA("Seat") then
-						driveSeat = obj
-						break
-					end
+	Manager:CreateToggle({
+		Menu = "Wapen",
+		Name = "No Recoil",
+		Default = false,
+		Callback = function(state)
+			local settings = getActiveACS()
+			if settings then
+				if state then
+					settings._origCamRecoilUp = settings.camRecoil and settings.camRecoil.camRecoilUp
+					settings._origGunRecoilUp = settings.gunRecoil and settings.gunRecoil.gunRecoilUp
+					if settings.camRecoil then settings.camRecoil.camRecoilUp = {0, 0} end
+					if settings.gunRecoil then settings.gunRecoil.gunRecoilUp = {0, 0} end
+				else
+					if settings.camRecoil and settings._origCamRecoilUp then settings.camRecoil.camRecoilUp = settings._origCamRecoilUp end
+					if settings.gunRecoil and settings._origGunRecoilUp then settings.gunRecoil.gunRecoilUp = settings._origGunRecoilUp end
 				end
 			end
+		end,
+	})
 	
-			if not driveSeat then
-				warn("[Voertuig] Geen stoel in de auto.")
-				return
-			end
-	
-			-- Move the car in front of the player
-			local targetPos = root.CFrame + root.CFrame.LookVector * 8
-			local carCFrame = CFrame.new(targetPos.Position, targetPos.Position + root.CFrame.LookVector)
-	
-			-- Move every BasePart of the car by the same offset (keeps wheels aligned)
-			if car.PrimaryPart then
-				car:PivotTo(carCFrame)
-			else
-				-- Fallback for models without PrimaryPart
-				local offset = carCFrame.Position - driveSeat.Position
-				for _, obj in ipairs(car:GetDescendants()) do
-					if obj:IsA("BasePart") then
-						obj.CFrame = obj.CFrame + offset
-					end
+	Manager:CreateToggle({
+		Menu = "Wapen",
+		Name = "Instant Bullet Velocity",
+		Default = false,
+		Callback = function(state)
+			local settings = getActiveACS()
+			if settings then
+				if state then
+					settings._origVel = settings.MuzzleVelocity
+					settings.MuzzleVelocity = 999999
+				else
+					if settings._origVel then settings.MuzzleVelocity = settings._origVel end
 				end
 			end
+		end,
+	})
 	
-			-- Sit the player in the seat
-			task.wait(0.1)
-			root.CFrame = driveSeat.CFrame + Vector3.new(0, 3, 0)
-			task.wait(0.05)
-			driveSeat:Sit(char:FindFirstChildOfClass("Humanoid"))
+	Manager:CreateToggle({
+		Menu = "Wapen",
+		Name = "No Bullet Drop",
+		Default = false,
+		Callback = function(state)
+			local settings = getActiveACS()
+			if settings then
+				if state then
+					settings._origDrop = settings.BulletDrop
+					settings.BulletDrop = 0
+				else
+					if settings._origDrop then settings.BulletDrop = settings._origDrop end
+				end
+			end
 		end,
 	})
 	
@@ -2017,9 +1928,17 @@ local function NLZI_fake_script() -- Main.Bootstrap.luau
 		Menu = "Apeldoorn",
 		Name = "God mode (forcefield)",
 		Callback = function()
-			local player                             = game.Players.LocalPlayer
-			local greenzone                          = workspace.Framework.Burgers.Spawns.Safezones:GetChildren()[3]
-			local blackscreen                        = Instance.new("ScreenGui")
+			local player                         = game.Players.LocalPlayer
+			local char                           = player.Character or player.CharacterAdded:Wait()
+			local humanoid                       = char:WaitForChild("Humanoid")
+			local rootPart                       = char:WaitForChild("HumanoidRootPart")
+	
+			-- 1. Force jump first to unseat/unglue if already in a seat
+			humanoid.Jump = true
+			task.wait(0.05)
+	
+			local greenzone                      = workspace.Framework.Burgers.Spawns.Safezones:GetChildren()[3]
+			local blackscreen                    = Instance.new("ScreenGui")
 			blackscreen.Parent = game:GetService("Players").LocalPlayer.PlayerGui
 			blackscreen.Name = "BlackScreen"
 			local blackscreentext = Instance.new("TextLabel")
@@ -2035,10 +1954,10 @@ local function NLZI_fake_script() -- Main.Bootstrap.luau
 			blackscreentext.BackgroundTransparency = 0
 			blackscreentext.TextScaled = true
 	
-			local originalPosition = player.Character.HumanoidRootPart.CFrame
+			local originalPosition = rootPart.CFrame
 	
-			player.Character.HumanoidRootPart.CFrame = greenzone.CFrame
-			wait(0.2)
+			rootPart.CFrame = greenzone.CFrame
+			task.wait(0.2)
 			local function findSeat()
 				for _, obj in pairs(workspace:GetDescendants()) do
 					if obj:IsA("Seat") and not obj.Occupant then
@@ -2050,17 +1969,41 @@ local function NLZI_fake_script() -- Main.Bootstrap.luau
 	
 			local seat = findSeat()
 			if seat then
-				player.Character.HumanoidRootPart.CFrame = seat.CFrame
-				wait(0.01)
-				player.Character.Humanoid.Jump           = true
-				wait(0.05)
+				rootPart.CFrame = seat.CFrame
+				task.wait(0.01)
+				humanoid.Jump = true
+				task.wait(0.05)
 				seat:Destroy()                           -- ⬅ delete the seat after use
 			end
 	
-			player.Character.HumanoidRootPart.CFrame = originalPosition
-			player.Character.Humanoid.Jump           = true
-			wait(0.2)
+			rootPart.CFrame = originalPosition
+	
+			-- 2. Force jump again right before black screen is destroyed (everything completed)
+			humanoid.Jump = true
+			task.wait(0.2)
+	
 			blackscreen:Destroy()
+		end,
+	})
+	
+	Manager:CreateButton({
+		Menu = "Apeldoorn",
+		Name = "Wapens spawnen",
+		Callback = function()
+			function recurse(instance)
+				if instance:IsA("Tool") or instance:IsA("HopperBin") then
+					if workspace.FilteringEnabled == false then
+						c = instance:Clone()
+						c.Parent = game.Players.LocalPlayer.Backpack
+					else
+						instance.Parent = game.Players.LocalPlayer.Backpack
+					end
+				end
+				for _, child in ipairs(instance:GetChildren()) do
+					recurse(child)
+				end
+			end
+			recurse(game)
 		end,
 	})
 	
@@ -2072,8 +2015,11 @@ local function NLZI_fake_script() -- Main.Bootstrap.luau
 	Manager:CreateSlider({
 		Menu = "Voertuig",
 		Name = "Top Speed",
-		Min = 1, Max = 10, Default = 3.5, Increment = 0.1,
-		Suffix = " fd",
+		Min = 1, 
+		Max = 1000, 
+		Default = 3.5, -- Fallback; will attempt to read actual value below
+		Increment = 1,
+		Suffix = " MPH",
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
@@ -2089,9 +2035,112 @@ local function NLZI_fake_script() -- Main.Bootstrap.luau
 			end
 	
 			local car = getPlayerCar(LocalPlayer.Name)
-			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
-			local tune = require(car:FindFirstChild("A-Chassis Tune"))
-			tune.FinalDrive = v
+			if not car then return end
+	
+			-- Update the TopSpeed value object if it exists in the car
+			local topSpeedVal = car:FindFirstChild("TopSpeed") or car:FindFirstChild("FinalDrive")
+			if topSpeedVal and topSpeedVal:IsA("ValueBase") then
+				topSpeedVal.Value = v
+			end
+	
+			-- Update the live A-Chassis tune module
+			local tuneScript = car:FindFirstChild("A-Chassis Tune")
+			if tuneScript then
+				local success, tune = pcall(function()
+					return require(tuneScript)
+				end)
+	
+				if success and type(tune) == "table" then
+					-- Adjusts the FinalDrive or a custom TopSpeed property depending on how your tune handles it
+					tune.FinalDrive = v 
+				end
+			end
+		end,
+	})
+	
+	
+	-- Horsepower Slider
+	Manager:CreateSlider({
+		Menu = "Voertuig",
+		Name = "Horsepower",
+		Min = 1, 
+		Max = 10000, 
+		Default = 325, -- Fallback default; will try to read from car value if available
+		Increment = 1,
+		Suffix = " HP",
+		Callback = function(v)
+			local Players     = game:GetService("Players")
+			local LocalPlayer = Players.LocalPlayer
+	
+			local function getPlayerCar(plrName)
+				local spelers = workspace:FindFirstChild("Spelers")
+				if not spelers then return nil end
+				local plrFolder = spelers:FindFirstChild(plrName)
+				if not plrFolder then return nil end
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
+				if not autoFolder then return nil end
+				return autoFolder:GetChildren()[1]
+			end
+	
+			local car = getPlayerCar(LocalPlayer.Name)
+			if not car then return end
+	
+			-- 1. Update the Value object if it exists
+			local hpVal = car:FindFirstChild("Horsepower")
+			if hpVal and hpVal:IsA("ValueBase") then
+				hpVal.Value = v
+			end
+	
+			-- 2. Force update the live A-Chassis tune module
+			local tuneScript = car:FindFirstChild("A-Chassis Tune")
+			if tuneScript then
+				local success, tune = pcall(function()
+					return require(tuneScript)
+				end)
+	
+				if success and type(tune) == "table" then
+					tune.Horsepower = v
+				end
+			end
+		end,
+	})
+	
+	-- RevAccel Slider
+	Manager:CreateSlider({
+		Menu = "Voertuig",
+		Name = "Rev Acceleration",
+		Min = 50, 
+		Max = 1500, 
+		Default = 450, 
+		Increment = 10,
+		Suffix = "",
+		Callback = function(v)
+			local Players     = game:GetService("Players")
+			local LocalPlayer = Players.LocalPlayer
+	
+			local function getPlayerCar(plrName)
+				local spelers = workspace:FindFirstChild("Spelers")
+				if not spelers then return nil end
+				local plrFolder = spelers:FindFirstChild(plrName)
+				if not plrFolder then return nil end
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
+				if not autoFolder then return nil end
+				return autoFolder:GetChildren()[1]
+			end
+	
+			local car = getPlayerCar(LocalPlayer.Name)
+			if not car then return end
+	
+			local tuneScript = car:FindFirstChild("A-Chassis Tune")
+			if tuneScript then
+				local success, tune = pcall(function()
+					return require(tuneScript)
+				end)
+	
+				if success and type(tune) == "table" then
+					tune.RevAccel = v
+				end
+			end
 		end,
 	})
 	
@@ -2556,74 +2605,5 @@ local function NLZI_fake_script() -- Main.Bootstrap.luau
 			tune.RAntiRoll = v
 		end,
 	})
-	
-	-- =========================================================
-	--  Gyro Damping  (stability / grip)
-	-- =========================================================
-	Manager:CreateSlider({
-		Menu = "Voertuig",
-		Name = "Grip (Gyro Damp)",
-		Min = 10, Max = 5000, Default = 100,
-		Callback = function(v)
-			local Players     = game:GetService("Players")
-			local LocalPlayer = Players.LocalPlayer
-	
-			local function getPlayerCar(plrName)
-				local spelers = workspace:FindFirstChild("Spelers")
-				if not spelers then return nil end
-				local plrFolder = spelers:FindFirstChild(plrName)
-				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Voertuig")
-				if not autoFolder then return nil end
-				return autoFolder:GetChildren()[1]
-			end
-	
-			local car = getPlayerCar(LocalPlayer.Name)
-			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
-			local tune = require(car:FindFirstChild("A-Chassis Tune"))
-			tune.FGyroDamp = v
-			tune.RGyroDamp = v
-		end,
-	})
-	
-	-- =========================================================
-	--  Center of Gravity Height  (lower = less rollover)
-	-- =========================================================
-	Manager:CreateSlider({
-		Menu = "Voertuig",
-		Name = "CG Height",
-		Min = 0.1, Max = 5, Default = 1.8, Increment = 0.1,
-		Callback = function(v)
-			local Players     = game:GetService("Players")
-			local LocalPlayer = Players.LocalPlayer
-	
-			local function getPlayerCar(plrName)
-				local spelers = workspace:FindFirstChild("Spelers")
-				if not spelers then return nil end
-				local plrFolder = spelers:FindFirstChild(plrName)
-				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Voertuig")
-				if not autoFolder then return nil end
-				return autoFolder:GetChildren()[1]
-			end
-	
-			local car = getPlayerCar(LocalPlayer.Name)
-			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
-			local tune = require(car:FindFirstChild("A-Chassis Tune"))
-			tune.CGHeight = v
-		end,
-	})
-	
-	-- =========================================================
-	--  WAPEN
-	-- =========================================================
-	
-	
-	
-	-- Placeholder buttons that don't do anything yet
-	
-	-- =========================================================
-	--  Other menus — empty for now, just so the pages exist
-	-- =========================================================
 end
-coroutine.wrap(NLZI_fake_script)()
+coroutine.wrap(DEMTGFO_fake_script)()
