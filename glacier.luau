@@ -1187,7 +1187,7 @@ end
 
 -- Scripts:
 
-local function TZQFK_fake_script() -- Annc.LocalScript 
+local function BFWOG_fake_script() -- Annc.LocalScript 
 	local script = Instance.new('LocalScript', Annc)
 	local req = require
 	local require = function(obj)
@@ -1220,8 +1220,8 @@ local function TZQFK_fake_script() -- Annc.LocalScript
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(TZQFK_fake_script)()
-local function LFUZAA_fake_script() -- Main.SmoothDrag 
+coroutine.wrap(BFWOG_fake_script)()
+local function UPDFACK_fake_script() -- Main.SmoothDrag 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1302,8 +1302,8 @@ local function LFUZAA_fake_script() -- Main.SmoothDrag
 		main.Position = currentPosition
 	end)
 end
-coroutine.wrap(LFUZAA_fake_script)()
-local function XPEKEKM_fake_script() -- Main.UIDisclose 
+coroutine.wrap(UPDFACK_fake_script)()
+local function NXCW_fake_script() -- Main.UIDisclose 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1317,8 +1317,8 @@ local function XPEKEKM_fake_script() -- Main.UIDisclose
 	local TweenService = game:GetService("TweenService")
 	local Mainn = script.Parent
 	Mainn.Visible = false
-	local window = script.Parent          -- Main frame
-	local gui    = window.Parent          -- GlacierUI ScreenGui
+	local window = script.Parent         -- Main frame
+	local gui    = window.Parent         -- GlacierUI ScreenGui
 	
 	-- Make the whole ScreenGui cover the screen edge-to-edge (no topbar gap)
 	gui.IgnoreGuiInset = true
@@ -1373,34 +1373,37 @@ local function XPEKEKM_fake_script() -- Main.UIDisclose
 	
 	--// Build loading frame (starts invisible so we can fade it in)
 	local loading = Instance.new("Frame")
-	loading.Name                   = "LoadingFrame"
-	loading.Size                   = UDim2.new(1, 0, 1, 0)
-	loading.Position               = UDim2.new(0.5, 0, 0.5, 0)
-	loading.AnchorPoint            = Vector2.new(0.5, 0.5)
-	loading.BackgroundColor3       = Color3.fromRGB(25, 25, 25)
+	loading.Name                     = "LoadingFrame"
+	loading.Size                     = UDim2.new(1, 0, 1, 0)
+	loading.Position                 = UDim2.new(0.5, 0, 0.5, 0)
+	loading.AnchorPoint              = Vector2.new(0.5, 0.5)
+	loading.BackgroundColor3         = Color3.fromRGB(25, 25, 25)
 	loading.BackgroundTransparency = 1
 	loading.BorderSizePixel        = 0
 	loading.ZIndex                 = 100
 	loading.Parent                 = gui
 	
 	local loadingText = Instance.new("TextLabel")
-	loadingText.Name                   = "LoadingText"
-	loadingText.Size                   = UDim2.new(1, 0, 0, 40)
-	loadingText.Position               = UDim2.new(0.5, 0, 0.5, -20)
-	loadingText.AnchorPoint            = Vector2.new(0.5, 0.5)
+	loadingText.Name                     = "LoadingText"
+	loadingText.Size                     = UDim2.new(1, 0, 0, 40)
+	loadingText.Position                 = UDim2.new(0.5, 0, 0.5, -20)
+	loadingText.AnchorPoint              = Vector2.new(0.5, 0.5)
 	loadingText.BackgroundTransparency = 1
 	loadingText.TextColor3             = Color3.fromRGB(240, 240, 240)
-	loadingText.Font                   = Enum.Font.GothamBold
-	loadingText.TextSize               = 24
-	loadingText.Text                   = "Connecting to Glacier Servers"
-	loadingText.TextTransparency       = 1
-	loadingText.ZIndex                 = 101
+	loadingText.Font                     = Enum.Font.GothamBold
+	loadingText.TextSize                 = 24
+	loadingText.Text                     = "Connecting to Glacier Servers"
+	loadingText.TextTransparency         = 1
+	loadingText.ZIndex                   = 101
 	loadingText.Parent                 = loading
 	
 	--// Fade the loading frame in
 	local fadeInInfo = TweenInfo.new(FADE_IN, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 	TweenService:Create(loading,     fadeInInfo, { BackgroundTransparency = 0 }):Play()
-	TweenService:Create(loadingText, fadeInInfo, { TextTransparency       = 0 }):Play()
+	TweenService:Create(loadingText, fadeInInfo, { TextTransparency        = 0 }):Play()
+	
+	-- Flag to halt execution if blacklisted
+	local isBlacklisted = false
 	
 	--// Animated dots with HWID check
 	task.spawn(function()
@@ -1418,23 +1421,14 @@ local function XPEKEKM_fake_script() -- Main.UIDisclose
 	
 				-- Check if HWID is blacklisted
 				if isHwidBlacklisted(GetHwid) then
-					-- HWID is blacklisted, show banned message
+					isBlacklisted = true
 					loadingText.Text = "You have been blacklisted from using glacier, closing UI..."
+					task.wait(1.5)
 	
-					-- Show spinning dots after the banned message
-					task.wait(1)
-					local bannedBase = "You have been blacklisted from using glacier, closing UI"
-					local spinChars = {"|", "/", "-", "\\"}
-					local spinIndex = 0
-	
-					while loading.Parent do
-						spinIndex = (spinIndex % #spinChars) + 1
-						loadingText.Text = bannedBase .. " " .. spinChars[spinIndex]
-						task.wait(0.2)
+					-- Immediately destroy the entire ScreenGui
+					if gui and gui.Parent then
+						gui:Destroy()
 					end
-	
-					-- Destroy the UI after a delay
-				    script.Parent.Parent:Destroy()
 					return
 				end
 			end
@@ -1442,7 +1436,6 @@ local function XPEKEKM_fake_script() -- Main.UIDisclose
 			task.wait(0.35)
 		end
 	end)
-	
 	
 	--// Send session details to webhook
 	task.spawn(function()
@@ -1500,14 +1493,23 @@ local function XPEKEKM_fake_script() -- Main.UIDisclose
 	end)
 	
 	--// Simulated load time
-	task.wait(LOAD_TIME)
+	local elapsed = 0
+	while elapsed < LOAD_TIME do
+		if isBlacklisted then return end
+		task.wait(0.1)
+		elapsed = elapsed + 0.1
+	end
+	
+	if isBlacklisted then return end
 	
 	--// Fade loading frame out
 	local fadeOutInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 	TweenService:Create(loading,     fadeOutInfo, { BackgroundTransparency = 1 }):Play()
-	TweenService:Create(loadingText, fadeOutInfo, { TextTransparency       = 1 }):Play()
+	TweenService:Create(loadingText, fadeOutInfo, { TextTransparency        = 1 }):Play()
 	task.wait(0.35)
 	loading:Destroy()
+	
+	if isBlacklisted then return end
 	
 	--// Show Main folded, then fold it open from the center
 	window.Visible = true
@@ -1557,8 +1559,8 @@ local function XPEKEKM_fake_script() -- Main.UIDisclose
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(XPEKEKM_fake_script)()
-local function WGAFVQJ_fake_script() -- Main.Main.luau 
+coroutine.wrap(NXCW_fake_script)()
+local function JWOX_fake_script() -- Main.Main.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1679,8 +1681,8 @@ local function WGAFVQJ_fake_script() -- Main.Main.luau
 		purge = purgeDuplicates,
 	}
 end
-coroutine.wrap(WGAFVQJ_fake_script)()
-local function PFQU_fake_script() -- Main.Bootstrap.luau 
+coroutine.wrap(JWOX_fake_script)()
+local function OBWBAN_fake_script() -- Main.Bootstrap.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -2625,4 +2627,4 @@ local function PFQU_fake_script() -- Main.Bootstrap.luau
 	--  Other menus — empty for now, just so the pages exist
 	-- =========================================================
 end
-coroutine.wrap(PFQU_fake_script)()
+coroutine.wrap(OBWBAN_fake_script)()
