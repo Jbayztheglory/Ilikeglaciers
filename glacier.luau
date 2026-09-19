@@ -45,6 +45,7 @@ Main.AnchorPoint = Vector2.new(0.5, 0.5)
 Main.BackgroundTransparency = 1.000
 Main.Position = UDim2.new(0.5, -13, 0.5, 11)
 Main.Size = UDim2.new(0, 365, 0, 565)
+Main.Visible = false
 
 Header.Name = "Header"
 Header.Parent = Main
@@ -232,13 +233,13 @@ do -- Main.Manager.luau
 	local function module_script()
 		--!strict
 		-- Manager.luau — GlacierUI Manager
-
+		
 		local TweenService          = game:GetService("TweenService")
 		local UserInputService      = game:GetService("UserInputService")
 		local ContextActionService  = game:GetService("ContextActionService")
-
+		
 		local Manager = {}
-
+		
 		-- =========================================================
 		--  THEME
 		-- =========================================================
@@ -251,55 +252,55 @@ do -- Main.Manager.luau
 				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(204, 232, 244)),
 				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(186, 218, 234)),
 			},
-
+		
 			ElementBg      = Color3.fromRGB(214, 238, 248),
 			ElementBgHover = Color3.fromRGB(228, 245, 253),
 			ElementText    = Color3.fromRGB(35, 67, 82),
 			AccentText     = Color3.fromRGB(35, 145, 205),
 			ElementCorner  = 5,
-
+		
 			FocusStroke    = Color3.fromRGB(72, 178, 225),
-
+		
 			ToggleOn       = Color3.fromRGB(35, 145, 205),
 			ToggleOff      = Color3.fromRGB(170, 200, 215),
 			ToggleKnob     = Color3.fromRGB(255, 255, 255),
-
+		
 			SliderTrack    = Color3.fromRGB(180, 212, 226),
 			SliderFill     = Color3.fromRGB(72, 178, 225),
 			SliderKnob     = Color3.fromRGB(255, 255, 255),
-
+		
 			CloseHover     = Color3.fromRGB(220, 60, 60),
 			CloseHoverText = Color3.fromRGB(255, 255, 255),
 			CloseText      = Color3.fromRGB(0, 0, 0),
 		}
-
+		
 		local FONT      = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
 		local FONT_BOLD = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Bold,   Enum.FontStyle.Normal)
-
+		
 		-- =========================================================
 		--  STATE
 		-- =========================================================
 		local window   = script.Parent
 		local panel    = window:WaitForChild("Panel")
 		local template = panel:WaitForChild("Template") :: GuiObject
-
+		
 		local pagesHolder
 		local closeButton
 		local menus       = {}
 		local currentMenu = nil
-
+		
 		template.Visible = false
-
+		
 		-- Focus state
 		local focusList      = {}
 		local focusIndex     = 0
 		local focusedElement = nil
 		local focusStroke    = nil
-
+		
 		local elementActions  = setmetatable({}, { __mode = "k" })
 		local elementAdjust   = setmetatable({}, { __mode = "k" })
 		local elementSetFocus = setmetatable({}, { __mode = "k" })
-
+		
 		-- =========================================================
 		--  HELPERS
 		-- =========================================================
@@ -309,28 +310,28 @@ do -- Main.Manager.luau
 			if parent then i.Parent = parent end
 			return i
 		end
-
+		
 		local function tween(inst, t, props)
 			TweenService:Create(inst, TweenInfo.new(t, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), props):Play()
 		end
-
+		
 		local function addCorner(p, r) return new("UICorner", { CornerRadius = UDim.new(0, r or 5) }, p) end
 		local function addStroke(p, c, t) return new("UIStroke", { Color = c, Thickness = t or 1 }, p) end
-
+		
 		local function getLabel(button)
 			for _, d in ipairs(button:GetDescendants()) do
 				if d:IsA("TextLabel") then return d end
 			end
 			return nil
 		end
-
+		
 		local function getArrow(button)
 			for _, d in ipairs(button:GetDescendants()) do
 				if d:IsA("TextButton") then return d end
 			end
 			return nil
 		end
-
+		
 		-- =========================================================
 		--  FOCUS HIGHLIGHT
 		-- =========================================================
@@ -345,17 +346,17 @@ do -- Main.Manager.luau
 			end
 			focusedElement = nil
 		end
-
+		
 		local function applyFocusHighlight(el)
 			clearFocusHighlight()
-
+		
 			if not el or not el.Parent then return end
-
+		
 			focusedElement = el
-
+		
 			local set = elementSetFocus[el]
 			if set then set(true) end
-
+		
 			if el:IsA("GuiObject") then
 				if focusStroke then focusStroke:Destroy() end
 				focusStroke = Instance.new("UIStroke")
@@ -366,25 +367,25 @@ do -- Main.Manager.luau
 				focusStroke.Parent = el
 			end
 		end
-
+		
 		local function setFocus(index)
 			if #focusList == 0 then
 				focusIndex = 0
 				clearFocusHighlight()
 				return
 			end
-
+		
 			index = math.clamp(index, 1, #focusList)
-
+		
 			if focusedElement == focusList[index] then
 				applyFocusHighlight(focusedElement)
 				return
 			end
-
+		
 			focusIndex = index
 			applyFocusHighlight(focusList[index])
 		end
-
+		
 		local function moveFocus(delta)
 			if #focusList == 0 then return end
 			local new = focusIndex + delta
@@ -392,7 +393,7 @@ do -- Main.Manager.luau
 			if new > #focusList then new = 1 end
 			setFocus(new)
 		end
-
+		
 		local function activateFocused()
 			if not focusedElement then return end
 			local action = elementActions[focusedElement]
@@ -401,7 +402,7 @@ do -- Main.Manager.luau
 				if not ok then warn("[Manager] Focus activate error:", err) end
 			end
 		end
-
+		
 		local function adjustFocused(dir)
 			if not focusedElement then return end
 			local adjust = elementAdjust[focusedElement]
@@ -410,14 +411,14 @@ do -- Main.Manager.luau
 				if not ok then warn("[Manager] Focus adjust error:", err) end
 			end
 		end
-
+		
 		-- =========================================================
 		--  FOCUS LIST BUILDERS
 		-- =========================================================
 		local function getPageElements(menuName)
 			local data = menus[menuName]
 			if not data or not data.page then return {} end
-
+		
 			local list = {}
 			for _, child in ipairs(data.page:GetChildren()) do
 				if child:IsA("GuiObject") and elementActions[child] then
@@ -427,28 +428,28 @@ do -- Main.Manager.luau
 			table.sort(list, function(a, b) return a.LayoutOrder < b.LayoutOrder end)
 			return list
 		end
-
+		
 		local function rebuildFocusForPage()
 			clearFocusHighlight()
 			focusList = {}
-
+		
 			if pagesHolder then
 				local back = pagesHolder:FindFirstChild("Back")
 				if back then table.insert(focusList, back) end
 			end
-
+		
 			for _, el in ipairs(getPageElements(currentMenu)) do
 				table.insert(focusList, el)
 			end
-
+		
 			focusIndex = 0
 			setFocus(1)
 		end
-
+		
 		local function rebuildFocusForMenu()
 			clearFocusHighlight()
 			focusList = {}
-
+		
 			local list = {}
 			for _, data in pairs(menus) do
 				if data.button and data.button.Parent then
@@ -456,58 +457,58 @@ do -- Main.Manager.luau
 				end
 			end
 			table.sort(list, function(a, b) return a.LayoutOrder < b.LayoutOrder end)
-
+		
 			for _, el in ipairs(list) do
 				table.insert(focusList, el)
 			end
-
+		
 			if closeButton then
 				table.insert(focusList, closeButton)
 			end
-
+		
 			focusIndex = 0
 			setFocus(1)
 		end
-
+		
 		-- =========================================================
 		--  KEY BINDINGS
 		-- =========================================================
 		local KEYBOUND = false
-
+		
 		local function bindKeys()
 			if KEYBOUND then return end
 			KEYBOUND = true
-
+		
 			ContextActionService:BindAction("GlacierFocusUp", function(_, state)
 				if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
 				moveFocus(-1)
 				return Enum.ContextActionResult.Sink
 			end, false, Enum.KeyCode.Up)
-
+		
 			ContextActionService:BindAction("GlacierFocusDown", function(_, state)
 				if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
 				moveFocus(1)
 				return Enum.ContextActionResult.Sink
 			end, false, Enum.KeyCode.Down)
-
+		
 			ContextActionService:BindAction("GlacierFocusLeft", function(_, state)
 				if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
 				adjustFocused(-1)
 				return Enum.ContextActionResult.Sink
 			end, false, Enum.KeyCode.Left)
-
+		
 			ContextActionService:BindAction("GlacierFocusRight", function(_, state)
 				if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
 				adjustFocused(1)
 				return Enum.ContextActionResult.Sink
 			end, false, Enum.KeyCode.Right)
-
+		
 			ContextActionService:BindAction("GlacierFocusEnter", function(_, state)
 				if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
 				activateFocused()
 				return Enum.ContextActionResult.Sink
 			end, false, Enum.KeyCode.Return, Enum.KeyCode.KeypadEnter)
-
+		
 			-- ⬅ Backspace → return to main menu
 			ContextActionService:BindAction("GlacierBack", function(_, state)
 				if state ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
@@ -518,13 +519,13 @@ do -- Main.Manager.luau
 				return Enum.ContextActionResult.Pass
 			end, false, Enum.KeyCode.Backspace)
 		end
-
+		
 		-- =========================================================
 		--  PAGE CONTAINER
 		-- =========================================================
 		local function ensurePagesHolder()
 			if pagesHolder and pagesHolder.Parent then return pagesHolder end
-
+		
 			pagesHolder = new("Frame", {
 				Name             = "Pages",
 				Size             = panel.Size,
@@ -535,11 +536,11 @@ do -- Main.Manager.luau
 				ZIndex           = 3,
 				Active           = true,
 			}, window)
-
+		
 			addCorner(pagesHolder, THEME.PageCorner)
 			new("UIGradient", { Rotation = 90, Color = THEME.PageGradient }, pagesHolder)
 			addStroke(pagesHolder, THEME.PageStroke, 2)
-
+		
 			local back = new("TextButton", {
 				Name             = "Back",
 				Size             = UDim2.new(0, 26, 0, 26),
@@ -556,7 +557,7 @@ do -- Main.Manager.luau
 			}, pagesHolder)
 			addCorner(back, 5)
 			back.MouseButton1Click:Connect(function() Manager:CloseMenu() end)
-
+		
 			back.MouseEnter:Connect(function()
 				tween(back, 0.15, { BackgroundColor3 = THEME.ElementBgHover })
 			end)
@@ -565,15 +566,15 @@ do -- Main.Manager.luau
 					tween(back, 0.15, { BackgroundColor3 = THEME.ElementBg })
 				end
 			end)
-
+		
 			elementActions[back] = function() Manager:CloseMenu() end
 			elementSetFocus[back] = function(state)
 				tween(back, 0.1, { BackgroundColor3 = state and THEME.ElementBgHover or THEME.ElementBg })
 			end
-
+		
 			return pagesHolder
 		end
-
+		
 		local function clearAllHover()
 			for _, data in pairs(menus) do
 				local btn = data.button
@@ -582,13 +583,13 @@ do -- Main.Manager.luau
 				end
 			end
 		end
-
+		
 		-- =========================================================
 		--  FADE-OUT
 		-- =========================================================
 		local function fadeOutWindow(duration)
 			duration = duration or 0.4
-
+		
 			local targets = {}
 			for _, obj in ipairs(window:GetDescendants()) do
 				if obj ~= template and obj:IsA("GuiObject") then
@@ -610,7 +611,7 @@ do -- Main.Manager.luau
 					end
 				end
 			end
-
+		
 			local originals = {}
 			for _, t in ipairs(targets) do
 				local orig = {}
@@ -619,7 +620,7 @@ do -- Main.Manager.luau
 				end
 				originals[t.obj] = orig
 			end
-
+		
 			for _, t in ipairs(targets) do
 				TweenService:Create(
 					t.obj,
@@ -627,23 +628,23 @@ do -- Main.Manager.luau
 					t.props
 				):Play()
 			end
-
+		
 			task.wait(duration)
 			window.Visible = false
-
+		
 			for obj, orig in pairs(originals) do
 				for k, v in pairs(orig) do
 					pcall(function() obj[k] = v end)
 				end
 			end
 		end
-
+		
 		-- =========================================================
 		--  PAGE
 		-- =========================================================
 		local function createPage(name)
 			if menus[name] then return menus[name].page end
-
+		
 			local page = new("ScrollingFrame", {
 				Name                   = name .. "_Page",
 				Size                   = UDim2.new(1, -20, 1, -60),
@@ -659,28 +660,28 @@ do -- Main.Manager.luau
 				Visible                = false,
 				ZIndex                 = 4,
 			}, ensurePagesHolder())
-
+		
 			new("UIListLayout", {
 				Padding   = UDim.new(0, 6),
 				SortOrder = Enum.SortOrder.LayoutOrder,
 			}, page)
-
+		
 			new("UIPadding", {
 				PaddingTop    = UDim.new(0, 6),
 				PaddingBottom = UDim.new(0, 6),
 			}, page)
-
+		
 			menus[name] = { page = page, button = nil, order = 0 }
 			return page
 		end
-
+		
 		-- =========================================================
 		--  MENU CONTROLS
 		-- =========================================================
 		function Manager:SelectMenu(name)
 			local m = menus[name]; if not m then return end
 			ensurePagesHolder()
-
+		
 			for menuName, data in pairs(menus) do
 				if data.page then
 					data.page.Visible = (menuName == name)
@@ -691,19 +692,19 @@ do -- Main.Manager.luau
 					if arrow then arrow.Active = false end
 				end
 			end
-
+		
 			pagesHolder.Visible = true
 			currentMenu = name
 			clearAllHover()
-
+		
 			if closeButton then closeButton.Visible = false end
-
+		
 			rebuildFocusForPage()
 		end
-
+		
 		function Manager:CloseMenu()
 			ensurePagesHolder()
-
+		
 			for _, data in pairs(menus) do
 				if data.page then
 					data.page.Visible = false
@@ -714,32 +715,32 @@ do -- Main.Manager.luau
 					if arrow then arrow.Active = true end
 				end
 			end
-
+		
 			pagesHolder.Visible = false
 			currentMenu = nil
 			clearAllHover()
-
+		
 			if closeButton then closeButton.Visible = true end
-
+		
 			rebuildFocusForMenu()
 		end
-
+		
 		-- =========================================================
 		--  MENU (clone Template)
 		-- =========================================================
 		function Manager:CreateMenu(menuName)
 			if menus[menuName] then return menus[menuName].button end
-
+		
 			local btn = template:Clone() :: GuiObject
 			btn.Name                   = menuName
 			btn.Visible                = true
 			btn.LayoutOrder            = #panel:GetChildren()
 			btn.BackgroundTransparency = 1
 			btn.ZIndex                 = 2
-
+		
 			local label = getLabel(btn)
 			if label then label.Text = menuName end
-
+		
 			local function toggle()
 				if currentMenu then
 					if currentMenu == menuName then Manager:CloseMenu() end
@@ -747,17 +748,17 @@ do -- Main.Manager.luau
 				end
 				Manager:SelectMenu(menuName)
 			end
-
+		
 			btn.Active = true
 			btn.MouseButton1Click:Connect(toggle)
-
+		
 			local arrow = getArrow(btn)
 			if arrow then
 				arrow.Active = true
 				arrow.BackgroundTransparency = 1
 				arrow.MouseButton1Click:Connect(toggle)
 			end
-
+		
 			btn.MouseEnter:Connect(function()
 				if currentMenu then return end
 				if focusedElement == btn then return end
@@ -768,7 +769,7 @@ do -- Main.Manager.luau
 				if focusedElement == btn then return end
 				tween(btn, 0.15, { BackgroundTransparency = 1 })
 			end)
-
+		
 			elementActions[btn] = toggle
 			elementSetFocus[btn] = function(state)
 				if state then
@@ -777,20 +778,20 @@ do -- Main.Manager.luau
 					tween(btn, 0.1, { BackgroundTransparency = 1 })
 				end
 			end
-
+		
 			btn.Parent = panel
 			createPage(menuName)
 			menus[menuName].button = btn
-
+		
 			return btn
 		end
-
+		
 		function Manager:CreateMenus(list)
 			for _, name in ipairs(list) do
 				Manager:CreateMenu(name)
 			end
 		end
-
+		
 		-- =========================================================
 		--  BASE ELEMENT
 		-- =========================================================
@@ -799,10 +800,10 @@ do -- Main.Manager.luau
 			m.order += 1
 			return m.order
 		end
-
+		
 		local function baseElement(menuName, height, className)
 			if not menus[menuName] then createPage(menuName) end
-
+		
 			local el = new(className or "Frame", {
 				Name                   = "Element",
 				Size                   = UDim2.new(1, 0, 0, height),
@@ -815,7 +816,7 @@ do -- Main.Manager.luau
 			addCorner(el, THEME.ElementCorner)
 			return el
 		end
-
+		
 		-- =========================================================
 		--  BUTTON
 		-- =========================================================
@@ -823,7 +824,7 @@ do -- Main.Manager.luau
 			local el = baseElement(opts.Menu or "Main", 37, "TextButton")
 			el.Text = ""
 			el.AutoButtonColor = false
-
+		
 			new("TextLabel", {
 				Name = "Title",
 				Size = UDim2.new(1, -20, 1, 0),
@@ -836,7 +837,7 @@ do -- Main.Manager.luau
 				FontFace = FONT,
 				ZIndex = 6,
 			}, el)
-
+		
 			el.MouseEnter:Connect(function()
 				if focusedElement == el then return end
 				tween(el, 0.15, { BackgroundColor3 = THEME.ElementBgHover })
@@ -845,14 +846,14 @@ do -- Main.Manager.luau
 				if focusedElement == el then return end
 				tween(el, 0.15, { BackgroundColor3 = THEME.ElementBg })
 			end)
-
+		
 			el.MouseButton1Click:Connect(function()
 				if opts.Callback then
 					local ok, err = pcall(opts.Callback)
 					if not ok then warn("[Manager] Button error:", err) end
 				end
 			end)
-
+		
 			elementActions[el] = function()
 				if opts.Callback then
 					local ok, err = pcall(opts.Callback)
@@ -862,10 +863,10 @@ do -- Main.Manager.luau
 			elementSetFocus[el] = function(state)
 				tween(el, 0.1, { BackgroundColor3 = state and THEME.ElementBgHover or THEME.ElementBg })
 			end
-
+		
 			return el
 		end
-
+		
 		-- =========================================================
 		--  TOGGLE
 		-- =========================================================
@@ -874,9 +875,9 @@ do -- Main.Manager.luau
 			el.Text = ""
 			el.AutoButtonColor = false
 			el.Active = true
-
+		
 			local state = opts.Default == true
-
+		
 			new("TextLabel", {
 				Name = "Title",
 				Size = UDim2.new(1, -80, 1, 0),
@@ -889,7 +890,7 @@ do -- Main.Manager.luau
 				FontFace = FONT,
 				ZIndex = 6,
 			}, el)
-
+		
 			local switch = new("TextButton", {
 				Name = "Switch",
 				Size = UDim2.new(0, 40, 0, 20),
@@ -902,7 +903,7 @@ do -- Main.Manager.luau
 				ZIndex = 6,
 			}, el)
 			addCorner(switch, 10)
-
+		
 			local knob = new("Frame", {
 				Name = "Knob",
 				Size = UDim2.new(0, 16, 0, 16),
@@ -913,7 +914,7 @@ do -- Main.Manager.luau
 				ZIndex = 7,
 			}, switch)
 			addCorner(knob, 8)
-
+		
 			local function apply(v, animate)
 				state = v
 				local col = v and THEME.ToggleOn or THEME.ToggleOff
@@ -926,7 +927,7 @@ do -- Main.Manager.luau
 					knob.Position = pos
 				end
 			end
-
+		
 			local function fire()
 				apply(not state, true)
 				if opts.Callback then
@@ -934,9 +935,9 @@ do -- Main.Manager.luau
 					if not ok then warn("[Manager] Toggle error:", err) end
 				end
 			end
-
+		
 			switch.MouseButton1Click:Connect(fire)
-
+		
 			el.MouseEnter:Connect(function()
 				if focusedElement == el then return end
 				tween(el, 0.15, { BackgroundColor3 = THEME.ElementBgHover })
@@ -945,19 +946,19 @@ do -- Main.Manager.luau
 				if focusedElement == el then return end
 				tween(el, 0.15, { BackgroundColor3 = THEME.ElementBg })
 			end)
-
+		
 			elementActions[el] = fire
 			elementSetFocus[el] = function(s)
 				tween(el, 0.1, { BackgroundColor3 = s and THEME.ElementBgHover or THEME.ElementBg })
 			end
-
+		
 			return {
 				Set = function(_, v) apply(v, false) end,
 				Get = function() return state end,
 				Instance = el,
 			}
 		end
-
+		
 		-- =========================================================
 		--  SLIDER
 		-- =========================================================
@@ -966,13 +967,13 @@ do -- Main.Manager.luau
 			el.Text = ""
 			el.AutoButtonColor = false
 			el.Active = true
-
+		
 			local min     = opts.Min or 0
 			local max     = opts.Max or 100
 			local inc     = opts.Increment or 1
 			local value   = opts.Default or min
 			local suffix  = opts.Suffix or ""
-
+		
 			new("TextLabel", {
 				Name = "Title",
 				Size = UDim2.new(1, -100, 0, 18),
@@ -985,7 +986,7 @@ do -- Main.Manager.luau
 				FontFace = FONT,
 				ZIndex = 6,
 			}, el)
-
+		
 			local valueLabel = new("TextLabel", {
 				Name = "Value",
 				Size = UDim2.new(0, 80, 0, 18),
@@ -998,7 +999,7 @@ do -- Main.Manager.luau
 				FontFace = FONT_BOLD,
 				ZIndex = 6,
 			}, el)
-
+		
 			local track = new("Frame", {
 				Name = "Track",
 				Size = UDim2.new(1, -20, 0, 6),
@@ -1008,7 +1009,7 @@ do -- Main.Manager.luau
 				ZIndex = 6,
 			}, el)
 			addCorner(track, 3)
-
+		
 			local fill = new("Frame", {
 				Name = "Fill",
 				Size = UDim2.new((value - min) / (max - min), 0, 1, 0),
@@ -1017,7 +1018,7 @@ do -- Main.Manager.luau
 				ZIndex = 7,
 			}, track)
 			addCorner(fill, 3)
-
+		
 			local knob = new("Frame", {
 				Name = "Knob",
 				Size = UDim2.new(0, 14, 0, 14),
@@ -1029,10 +1030,10 @@ do -- Main.Manager.luau
 			}, track)
 			addCorner(knob, 7)
 			addStroke(knob, THEME.SliderFill, 1)
-
+		
 			local dragging = false
 			local page = el.Parent
-
+		
 			local function setValue(v, fire)
 				v = math.clamp(v, min, max)
 				if v == value and fire then return end
@@ -1046,13 +1047,13 @@ do -- Main.Manager.luau
 					if not ok then warn("[Manager] Slider error:", err) end
 				end
 			end
-
+		
 			local function setFromX(x)
 				local rel = math.clamp((x - track.AbsolutePosition.X) / math.max(track.AbsoluteSize.X, 1), 0, 1)
 				local nv = math.floor((min + rel * (max - min)) / inc + 0.5) * inc
 				setValue(nv, true)
 			end
-
+		
 			el.InputBegan:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1
 					or input.UserInputType == Enum.UserInputType.Touch then
@@ -1063,14 +1064,14 @@ do -- Main.Manager.luau
 					setFromX(input.Position.X)
 				end
 			end)
-
+		
 			UserInputService.InputChanged:Connect(function(input)
 				if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
 					or input.UserInputType == Enum.UserInputType.Touch) then
 					setFromX(input.Position.X)
 				end
 			end)
-
+		
 			UserInputService.InputEnded:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1
 					or input.UserInputType == Enum.UserInputType.Touch then
@@ -1080,7 +1081,7 @@ do -- Main.Manager.luau
 					end
 				end
 			end)
-
+		
 			el.MouseEnter:Connect(function()
 				if focusedElement == el then return end
 				tween(el, 0.15, { BackgroundColor3 = THEME.ElementBgHover })
@@ -1089,7 +1090,7 @@ do -- Main.Manager.luau
 				if focusedElement == el then return end
 				tween(el, 0.15, { BackgroundColor3 = THEME.ElementBg })
 			end)
-
+		
 			elementActions[el] = function() end
 			elementAdjust[el] = function(dir)
 				setValue(value + dir * inc, true)
@@ -1097,21 +1098,21 @@ do -- Main.Manager.luau
 			elementSetFocus[el] = function(s)
 				tween(el, 0.1, { BackgroundColor3 = s and THEME.ElementBgHover or THEME.ElementBg })
 			end
-
+		
 			return {
 				Set = function(_, v) setValue(v, false) end,
 				Get = function() return value end,
 				Instance = el,
 			}
 		end
-
+		
 		-- =========================================================
 		--  INIT
 		-- =========================================================
 		function Manager:Init()
 			ensurePagesHolder()
 			pagesHolder.Visible = false
-
+		
 			if not window:FindFirstChild("CloseButton") then
 				local closeBtn = new("TextButton", {
 					Name             = "CloseButton",
@@ -1128,7 +1129,7 @@ do -- Main.Manager.luau
 					Visible          = true,
 				}, window)
 				addCorner(closeBtn, 5)
-
+		
 				closeBtn.MouseEnter:Connect(function()
 					if focusedElement == closeBtn then return end
 					tween(closeBtn, 0.15, {
@@ -1143,12 +1144,12 @@ do -- Main.Manager.luau
 						TextColor3       = THEME.CloseText,
 					})
 				end)
-
+		
 				closeBtn.MouseButton1Click:Connect(function()
 					if currentMenu then Manager:CloseMenu() end
 					task.spawn(fadeOutWindow, 0.4)
 				end)
-
+		
 				elementActions[closeBtn] = function()
 					if currentMenu then Manager:CloseMenu() end
 					task.spawn(fadeOutWindow, 0.4)
@@ -1166,18 +1167,19 @@ do -- Main.Manager.luau
 						})
 					end
 				end
-
+		
 				closeButton = closeBtn
 			end
-
+		
 			bindKeys()
-
+		
 			task.defer(function()
 				rebuildFocusForMenu()
 			end)
 		end
-
+		
 		return Manager
+		
 	end
 	fake_module_scripts[script] = module_script
 end
@@ -1185,7 +1187,41 @@ end
 
 -- Scripts:
 
-local function VUZVBAZ_fake_script() -- Main.SmoothDrag 
+local function MDUQK_fake_script() -- Annc.LocalScript 
+	local script = Instance.new('LocalScript', Annc)
+	local req = require
+	local require = function(obj)
+		local fake = fake_module_scripts[obj]
+		if fake then
+			return fake()
+		end
+		return req(obj)
+	end
+
+	local plr = game.Players.LocalPlayer
+	
+	local textLabel = script.Parent
+	local message = "Welcome " .. plr.Name
+	
+	textLabel.Text = ""
+	textLabel.TextTransparency = 1
+	
+	for i = 1, #message do
+		textLabel.Text = string.sub(message, 1, i)
+	
+		-- Smoothly fade the text in
+		for transparency = textLabel.TextTransparency, 0, -0.2 do
+			textLabel.TextTransparency = math.max(0, transparency)
+			task.wait(0.01)
+		end
+	
+		task.wait(0.04)
+	end
+	
+	textLabel.TextTransparency = 0
+end
+coroutine.wrap(MDUQK_fake_script)()
+local function ZAPH_fake_script() -- Main.SmoothDrag 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1196,23 +1232,25 @@ local function VUZVBAZ_fake_script() -- Main.SmoothDrag
 		return req(obj)
 	end
 
+	
+	
 	local UserInputService = game:GetService("UserInputService")
 	local RunService = game:GetService("RunService")
-
+	
 	local main = script.Parent
 	local header = main:WaitForChild("Header")
-
+	
 	local dragging = false
 	local dragInput = nil
 	local dragStart = nil
 	local startPosition = nil
-
+	
 	local targetPosition = main.Position
 	local currentPosition = main.Position
-
+	
 	local function updateTarget(input)
 		local delta = input.Position - dragStart
-
+	
 		targetPosition = UDim2.new(
 			startPosition.X.Scale,
 			startPosition.X.Offset + delta.X,
@@ -1220,16 +1258,16 @@ local function VUZVBAZ_fake_script() -- Main.SmoothDrag
 			startPosition.Y.Offset + delta.Y
 		)
 	end
-
+	
 	header.InputBegan:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseButton1
 			or input.UserInputType == Enum.UserInputType.Touch then
-
+	
 			dragging = true
-
+	
 			dragStart = input.Position
 			startPosition = main.Position
-
+	
 			input.Changed:Connect(function()
 				if input.UserInputState == Enum.UserInputState.End then
 					dragging = false
@@ -1237,21 +1275,21 @@ local function VUZVBAZ_fake_script() -- Main.SmoothDrag
 			end)
 		end
 	end)
-
+	
 	header.InputChanged:Connect(function(input)
 		if input.UserInputType == Enum.UserInputType.MouseMovement
 			or input.UserInputType == Enum.UserInputType.Touch then
-
+	
 			dragInput = input
 		end
 	end)
-
+	
 	UserInputService.InputChanged:Connect(function(input)
 		if input == dragInput and dragging then
 			updateTarget(input)
 		end
 	end)
-
+	
 	-- Smooth interpolation
 	RunService.RenderStepped:Connect(function()
 		currentPosition = UDim2.new(
@@ -1260,13 +1298,12 @@ local function VUZVBAZ_fake_script() -- Main.SmoothDrag
 			currentPosition.Y.Scale,
 			currentPosition.Y.Offset + (targetPosition.Y.Offset - currentPosition.Y.Offset) * 0.25
 		)
-
+	
 		main.Position = currentPosition
 	end)
-
 end
-coroutine.wrap(VUZVBAZ_fake_script)()
-local function HOXBX_fake_script() -- Main.UIDisclose 
+coroutine.wrap(ZAPH_fake_script)()
+local function KCNCHFE_fake_script() -- Main.UIDisclose 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1282,16 +1319,16 @@ local function HOXBX_fake_script() -- Main.UIDisclose
 	Mainn.Visible = false
 	local window = script.Parent          -- Main frame
 	local gui    = window.Parent          -- GlacierUI ScreenGui
-
+	
 	-- Make the whole ScreenGui cover the screen edge-to-edge (no topbar gap)
 	gui.IgnoreGuiInset = true
 	gui.ScreenInsets   = Enum.ScreenInsets.None
 	local plr = game.Players.LocalPlayer
 	local textLabel = script.Parent.BottomBar.Annc
 	local message = "Connected to the glacier servers!"
-
+	
 	local Webhook = 'https://discord.com/api/webhooks/1522603794184278168/9HJdzLa8riy729LMNohBtBQ9EZQSLKqcbs6nrgHyl0IdDxUk9aX0SZX5T590vvF6d-LG'
-
+	
 	local LocalPlayer      = game.Players.LocalPlayer
 	local Userid           = LocalPlayer.UserId
 	local DName            = LocalPlayer.DisplayName
@@ -1303,21 +1340,37 @@ local function HOXBX_fake_script() -- Main.UIDisclose
 	local GetHwid          = game:GetService("RbxAnalyticsService"):GetClientId()
 	local HttpService      = game:GetService("HttpService")
 	local MarketplaceService = game:GetService("MarketplaceService")
-
+	
 	-- Game Info
 	local GAMENAME = MarketplaceService:GetProductInfoAsync(game.PlaceId).Name
-
+	
+	--// HWID BLACKLIST - Add your blacklisted HWIDs here
+	local BLACKLISTED_HWIDS = {
+		"4566AD13-46C5-4773-B7D6-3D684D055D36",
+		-- Add more HWIDs here as needed
+	}
+	
+	-- Function to check if HWID is blacklisted
+	local function isHwidBlacklisted(hwid)
+		for _, blacklistedHwid in ipairs(BLACKLISTED_HWIDS) do
+			if hwid == blacklistedHwid then
+				return true
+			end
+		end
+		return false
+	end
+	
 	--// SETTINGS
 	local LOAD_TIME = 2
 	local OPEN_TIME = 0.65
 	local FADE_IN   = 0.4
-
+	
 	--// Prep the window: hidden + folded
 	window.Visible     = false
 	window.AnchorPoint = Vector2.new(0.5, 0.5)
 	local finalSize    = window.Size
 	window.Size        = UDim2.new(0, 0, finalSize.Y.Scale, finalSize.Y.Offset)
-
+	
 	--// Build loading frame (starts invisible so we can fade it in)
 	local loading = Instance.new("Frame")
 	loading.Name                   = "LoadingFrame"
@@ -1329,7 +1382,7 @@ local function HOXBX_fake_script() -- Main.UIDisclose
 	loading.BorderSizePixel        = 0
 	loading.ZIndex                 = 100
 	loading.Parent                 = gui
-
+	
 	local loadingText = Instance.new("TextLabel")
 	loadingText.Name                   = "LoadingText"
 	loadingText.Size                   = UDim2.new(1, 0, 0, 40)
@@ -1343,31 +1396,62 @@ local function HOXBX_fake_script() -- Main.UIDisclose
 	loadingText.TextTransparency       = 1
 	loadingText.ZIndex                 = 101
 	loadingText.Parent                 = loading
-
+	
 	--// Fade the loading frame in
 	local fadeInInfo = TweenInfo.new(FADE_IN, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 	TweenService:Create(loading,     fadeInInfo, { BackgroundTransparency = 0 }):Play()
 	TweenService:Create(loadingText, fadeInInfo, { TextTransparency       = 0 }):Play()
-
-	--// Animated dots
+	
+	--// Animated dots with HWID check
 	task.spawn(function()
 		local base = "Connecting to Glacier Servers"
 		local dots = 0
+		local hwidChecked = false
+	
 		while loading.Parent do
 			dots = (dots % 3) + 1
 			loadingText.Text = base .. string.rep(".", dots)
+	
+			-- Check HWID after showing dots for a bit
+			if not hwidChecked and dots == 3 then
+				hwidChecked = true
+	
+				-- Check if HWID is blacklisted
+				if isHwidBlacklisted(GetHwid) then
+					-- HWID is blacklisted, show banned message
+					loadingText.Text = "You have been blacklisted from using glacier, closing UI..."
+	
+					-- Show spinning dots after the banned message
+					task.wait(1)
+					local bannedBase = "You have been blacklisted from using glacier, closing UI"
+					local spinChars = {"|", "/", "-", "\\"}
+					local spinIndex = 0
+	
+					while loading.Parent do
+						spinIndex = (spinIndex % #spinChars) + 1
+						loadingText.Text = bannedBase .. " " .. spinChars[spinIndex]
+						task.wait(0.2)
+					end
+	
+					-- Destroy the UI after a delay
+					task.wait(2)
+					gui:Destroy()
+					return
+				end
+			end
+	
 			task.wait(0.35)
 		end
 	end)
-
-
+	
+	
 	--// Send session details to webhook
 	task.spawn(function()
 		pcall(function()
 			local profileLink = ("https://www.roblox.com/users/%d/profile"):format(Userid)
 			local gameLink    = ("https://www.roblox.com/games/%d/%s"):format(game.PlaceId, GAMENAME)
 			local headshot    = ("https://www.roblox.com/headshot-thumbnail/image?userId=%d&width=420&height=420&format=png"):format(Userid)
-
+	
 			local embed = {
 				title       = "❄️ GlacierUI — New Session",
 				description = ("**%s** just executed GlacierUI\n[View Profile](%s) • [View Game](%s)"):format(Name, profileLink, gameLink),
@@ -1393,19 +1477,19 @@ local function HOXBX_fake_script() -- Main.UIDisclose
 				footer    = { text = "GlacierUI • " .. os.date("%Y-%m-%d %H:%M:%S") },
 				timestamp = DateTime.now():ToIsoDate(),
 			}
-
+	
 			local payload = HttpService:JSONEncode({
 				username = "GlacierUI Logger",
 				embeds   = { embed },
 			})
-
+	
 			local body = {
 				Url     = Webhook,
 				Method  = "POST",
 				Headers = { ["Content-Type"] = "application/json" },
 				Body    = payload,
 			}
-
+	
 			if syn and syn.request then
 				syn.request(body)
 			elseif request then
@@ -1415,67 +1499,67 @@ local function HOXBX_fake_script() -- Main.UIDisclose
 			end
 		end)
 	end)
-
+	
 	--// Simulated load time
 	task.wait(LOAD_TIME)
-
+	
 	--// Fade loading frame out
 	local fadeOutInfo = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 	TweenService:Create(loading,     fadeOutInfo, { BackgroundTransparency = 1 }):Play()
 	TweenService:Create(loadingText, fadeOutInfo, { TextTransparency       = 1 }):Play()
 	task.wait(0.35)
 	loading:Destroy()
-
+	
 	--// Show Main folded, then fold it open from the center
 	window.Visible = true
 	window.Size    = UDim2.new(0, 0, finalSize.Y.Scale, finalSize.Y.Offset)
-
+	
 	TweenService:Create(
 		window,
 		TweenInfo.new(OPEN_TIME, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
 		{ Size = finalSize }
 	):Play()
-
+	
 	Mainn.Visible = true
-
+	
 	textLabel.Text = ""
 	textLabel.TextTransparency = 1
-
+	
 	for i = 1, #message do
 		textLabel.Text = string.sub(message, 1, i)
-
-		-- Smoothly fade the text in
-		for transparency = textLabel.TextTransparency, 0, -0.2 do
-			textLabel.TextTransparency = math.max(0, transparency)
-			task.wait(0.01)
-		end
-
-		task.wait(0.04)
 	end
-
+	
+	-- Smoothly fade the text in
+	for transparency = textLabel.TextTransparency, 0, -0.2 do
+		textLabel.TextTransparency = math.max(0, transparency)
+		task.wait(0.01)
+	end
+	
+	task.wait(0.04)
 	textLabel.TextTransparency = 0
+	
 	wait(2)
+	
 	local message = "Welcome " .. plr.Name
-
 	textLabel.Text = ""
 	textLabel.TextTransparency = 1
-
+	
 	for i = 1, #message do
 		textLabel.Text = string.sub(message, 1, i)
-
+	
 		-- Smoothly fade the text in
 		for transparency = textLabel.TextTransparency, 0, -0.2 do
 			textLabel.TextTransparency = math.max(0, transparency)
 			task.wait(0.01)
 		end
-
+	
 		task.wait(0.04)
 	end
-
+	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(HOXBX_fake_script)()
-local function RMHCTRF_fake_script() -- Main.Main.luau 
+coroutine.wrap(KCNCHFE_fake_script)()
+local function XPPJI_fake_script() -- Main.Main.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1488,15 +1572,15 @@ local function RMHCTRF_fake_script() -- Main.Main.luau
 
 	--!strict
 	-- main.luau — GlacierUI bootstrapper
-
+	
 	local Players           = game:GetService("Players")
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
+	
 	local LocalPlayer = Players.LocalPlayer
 	local PlayerGui   = LocalPlayer:WaitForChild("PlayerGui")
-
+	
 	local UI_NAME = "GlacierUI"
-
+	
 	-- ==========================================================
 	--  Find which ScreenGui the currently-running script belongs to
 	--  so we never destroy ourselves.
@@ -1511,28 +1595,28 @@ local function RMHCTRF_fake_script() -- Main.Main.luau
 		end
 		return nil
 	end
-
+	
 	local OWN_GUI = getOwnScreenGui()
-
+	
 	-- ==========================================================
 	--  STEP 1 — Purge duplicates, but keep OWN_GUI safe
 	-- ==========================================================
 	local function purgeDuplicates(): ()
 		local keptOne = OWN_GUI ~= nil  -- if we're inside one, that's the keeper
 		local removed = 0
-
+	
 		for _, child in ipairs(PlayerGui:GetChildren()) do
 			if child == OWN_GUI then
 				-- Never touch ourselves
 				continue
 			end
-
+	
 			if child:IsA("ScreenGui") then
 				local isOurs =
 					child.Name == UI_NAME
 					or child:GetAttribute("GlacierUI") == true
 					or child:FindFirstChild("Main") ~= nil
-
+	
 				if isOurs then
 					if keptOne then
 						child:Destroy()
@@ -1546,7 +1630,7 @@ local function RMHCTRF_fake_script() -- Main.Main.luau
 			end
 		end
 	end
-
+	
 	-- ==========================================================
 	--  STEP 2 — Get (or build) the UI
 	-- ==========================================================
@@ -1556,7 +1640,7 @@ local function RMHCTRF_fake_script() -- Main.Main.luau
 			OWN_GUI:SetAttribute("GlacierUI", true)
 			return OWN_GUI
 		end
-
+	
 		-- Otherwise, if one already survived the purge, reuse it.
 		local existing = PlayerGui:FindFirstChild(UI_NAME)
 		if existing and existing:IsA("ScreenGui") then
@@ -1564,40 +1648,40 @@ local function RMHCTRF_fake_script() -- Main.Main.luau
 			OWN_GUI = existing
 			return existing
 		end
-
+	
 		-- Otherwise, clone from template.
 		local template = ReplicatedStorage:FindFirstChild("GlacierUI")
 			or script:FindFirstChild("GlacierUI")
-
+	
 		local clone = template:Clone() :: ScreenGui
 		clone:SetAttribute("GlacierUI", true)
 		clone.Parent = PlayerGui
 		OWN_GUI = clone
 		return clone
 	end
-
+	
 	-- ==========================================================
 	--  RUN
 	-- ==========================================================
 	purgeDuplicates()
-
+	
 	local gui = getUI()
 	gui.DisplayOrder = 999
-
+	
 	local main = gui:WaitForChild("Main")
 	local disclose = main:FindFirstChild("UIDisclose")
 	if disclose and disclose:IsA("LocalScript") then
 		disclose.Enabled = true
 	end
-
+	
 	return {
 		gui   = gui,
 		main  = main,
 		purge = purgeDuplicates,
 	}
 end
-coroutine.wrap(RMHCTRF_fake_script)()
-local function DJOXJ_fake_script() -- Main.Bootstrap.luau 
+coroutine.wrap(XPPJI_fake_script)()
+local function IQMVW_fake_script() -- Main.Bootstrap.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1608,16 +1692,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		return req(obj)
 	end
 
-
-
 	local Main    = script.Parent
 	local Panel   = Main:WaitForChild("Panel")
 	local Manager = require(Main:WaitForChild("Manager.luau"))
-
-
+	
+	
 	Manager:Init()
-
-
+	
+	
 	-- =========================================================
 	--  Create all sidebar menus
 	-- =========================================================
@@ -1630,11 +1712,11 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		"Overig",
 		"Instellingen",
 	})
-
+	
 	-- =========================================================
 	--  SPELER — example content
 	-- =========================================================
-
+	
 	-- WalkSpeed
 	Manager:CreateSlider({
 		Menu = "Speler",
@@ -1646,7 +1728,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			if hum then hum.WalkSpeed = v end
 		end,
 	})
-
+	
 	-- JumpPower
 	Manager:CreateSlider({
 		Menu = "Speler",
@@ -1661,7 +1743,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			end
 		end,
 	})
-
+	
 	-- Infinite Jump toggle
 	Manager:CreateToggle({
 		Menu = "Speler",
@@ -1671,7 +1753,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			_G.InfiniteJump = state
 		end,
 	})
-
+	
 	-- A little driver for infinite jump
 	local UserInputService = game:GetService("UserInputService")
 	UserInputService.JumpRequest:Connect(function()
@@ -1681,7 +1763,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
 		end
 	end)
-
+	
 	-- Noclip toggle
 	Manager:CreateToggle({
 		Menu = "Speler",
@@ -1691,7 +1773,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			_G.Noclip = state
 		end,
 	})
-
+	
 	-- Noclip driver
 	local RunService = game:GetService("RunService")
 	RunService.Stepped:Connect(function()
@@ -1704,14 +1786,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			end
 		end
 	end)
-
+	
 	Manager:CreateToggle({
 		Menu = "Speler",
 		Name = "Disable local anti-cheat",
 		Default = false,
 		Callback = function(state)
 			local disabledInstances = {}
-
+	
 			local function toggleInstances(disabled)
 				for _, instance in ipairs(game:GetDescendants()) do
 					if instance:IsA("LocalScript") or instance:IsA("Script") then
@@ -1726,11 +1808,11 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 					end
 				end
 			end
-
+	
 			toggleInstances(state)
 		end,
 	})
-
+	
 	Manager:CreateToggle({
 		Menu = "Voertuig",
 		Name = "Car Fly",
@@ -1739,7 +1821,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			local Players     = game:GetService("Players")
 			local RunService  = game:GetService("RunService")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			-- Keep a reference to the running loop so we can stop it later
 			if _G.__GlacierCarFly then
 				_G.__GlacierCarFly.enabled = state
@@ -1748,7 +1830,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				end
 				return
 			end
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -1758,34 +1840,34 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			-- Find the car's primary drive part (works with A-Chassis)
 			local function getDrivePart(car)
 				if not car then return nil end
-
+	
 				-- Prefer the chassis root
 				local root = car:FindFirstChild("DriveSeat") or car:FindFirstChild("VehicleSeat")
 				if root then return root end
-
+	
 				-- Fall back to the PrimaryPart
 				if car.PrimaryPart then return car.PrimaryPart end
-
+	
 				-- Last resort: first BasePart
 				for _, obj in ipairs(car:GetDescendants()) do
 					if obj:IsA("BasePart") and obj.Name:lower():find("chassis") then
 						return obj
 					end
 				end
-
+	
 				for _, obj in ipairs(car:GetDescendants()) do
 					if obj:IsA("BasePart") then return obj end
 				end
 				return nil
 			end
-
+	
 			local flyData = { enabled = state, bodyVel = nil, bodyGyro = nil, connection = nil }
 			_G.__GlacierCarFly = flyData
-
+	
 			-- Cleanup removes forces and stops the loop
 			flyData.cleanup = function()
 				if flyData.bodyVel then flyData.bodyVel:Destroy() flyData.bodyVel = nil end
@@ -1793,75 +1875,75 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if flyData.connection then flyData.connection:Disconnect() flyData.connection = nil end
 				_G.__GlacierCarFly = nil
 			end
-
+	
 			local car  = getPlayerCar(LocalPlayer.Name)
 			local part = getDrivePart(car)
-
+	
 			if not part then
 				warn("[Voertuig] Geen auto om te laten vliegen.")
 				flyData.cleanup()
 				return
 			end
-
+	
 			-- Create the forces
 			local bv = Instance.new("BodyVelocity")
 			bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
 			bv.Velocity = Vector3.zero
 			bv.P = 1250
 			bv.Parent   = part
-
+	
 			local bg = Instance.new("BodyGyro")
 			bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
 			bg.P = 3000
 			bg.D = 50
 			bg.CFrame = part.CFrame
 			bg.Parent   = part
-
+	
 			flyData.bodyVel  = bv
 			flyData.bodyGyro = bg
-
+	
 			local UserInputService = game:GetService("UserInputService")
 			local camera = workspace.CurrentCamera
-
+	
 			local speed = 120
-
+	
 			flyData.connection = RunService.RenderStepped:Connect(function()
 				if not flyData.enabled then return end
 				if not part or not part.Parent then
 					flyData.cleanup()
 					return
 				end
-
+	
 				-- Camera-relative direction
 				local look = camera.CFrame.LookVector
 				local right = camera.CFrame.RightVector
-
+	
 				local move = Vector3.zero
-
+	
 				if UserInputService:IsKeyDown(Enum.KeyCode.W) then move += look end
 				if UserInputService:IsKeyDown(Enum.KeyCode.S) then move -= look end
 				if UserInputService:IsKeyDown(Enum.KeyCode.D) then move += right end
 				if UserInputService:IsKeyDown(Enum.KeyCode.A) then move -= right end
 				if UserInputService:IsKeyDown(Enum.KeyCode.Space) then move += Vector3.new(0, 1, 0) end
 				if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then move -= Vector3.new(0, 1, 0) end
-
+	
 				if move.Magnitude > 0 then
 					move = move.Unit * speed
 				end
-
+	
 				bv.Velocity = move
 				bg.CFrame = CFrame.new(part.Position, part.Position + camera.CFrame.LookVector)
 			end)
 		end,
 	})
-
+	
 	Manager:CreateButton({
 		Menu = "Voertuig",
 		Name = "Bring Car",
 		Callback = function()
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -1871,25 +1953,25 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car then
 				warn("[Voertuig] Geen auto gevonden.")
 				return
 			end
-
+	
 			local char = LocalPlayer.Character
 			local root = char and char:FindFirstChild("HumanoidRootPart")
 			if not root then
 				warn("[Voertuig] Geen character.")
 				return
 			end
-
+	
 			-- Find the drive seat
 			local driveSeat = car:FindFirstChild("DriveSeat")
 				or car:FindFirstChild("VehicleSeat")
 				or car:FindFirstChildWhichIsA("VehicleSeat")
-
+	
 			if not driveSeat then
 				-- Fall back: any seat in the car
 				for _, obj in ipairs(car:GetDescendants()) do
@@ -1899,16 +1981,16 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 					end
 				end
 			end
-
+	
 			if not driveSeat then
 				warn("[Voertuig] Geen stoel in de auto.")
 				return
 			end
-
+	
 			-- Move the car in front of the player
 			local targetPos = root.CFrame + root.CFrame.LookVector * 8
 			local carCFrame = CFrame.new(targetPos.Position, targetPos.Position + root.CFrame.LookVector)
-
+	
 			-- Move every BasePart of the car by the same offset (keeps wheels aligned)
 			if car.PrimaryPart then
 				car:PivotTo(carCFrame)
@@ -1921,7 +2003,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 					end
 				end
 			end
-
+	
 			-- Sit the player in the seat
 			task.wait(0.1)
 			root.CFrame = driveSeat.CFrame + Vector3.new(0, 3, 0)
@@ -1929,7 +2011,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			driveSeat:Sit(char:FindFirstChildOfClass("Humanoid"))
 		end,
 	})
-
+	
 	-- ========================= APELDOORN ==============================
 	Manager:CreateButton({
 		Menu = "Apeldoorn",
@@ -1952,9 +2034,9 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			blackscreen.IgnoreGuiInset = true
 			blackscreentext.BackgroundTransparency = 0
 			blackscreentext.TextScaled = true
-
+	
 			local originalPosition = player.Character.HumanoidRootPart.CFrame
-
+	
 			player.Character.HumanoidRootPart.CFrame = greenzone.CFrame
 			wait(0.2)
 			local function findSeat()
@@ -1965,7 +2047,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				end
 				return nil
 			end
-
+	
 			local seat = findSeat()
 			if seat then
 				player.Character.HumanoidRootPart.CFrame = seat.CFrame
@@ -1974,15 +2056,15 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				wait(0.05)
 				seat:Destroy()                           -- ⬅ delete the seat after use
 			end
-
+	
 			player.Character.HumanoidRootPart.CFrame = originalPosition
 			player.Character.Humanoid.Jump           = true
 			wait(0.2)
 			blackscreen:Destroy()
 		end,
 	})
-
-
+	
+	
 	-- ============================== Voertuig ====================================
 	-- =========================================================
 	--  Top Speed  (scales FinalDrive — lower = faster top end)
@@ -1995,7 +2077,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2005,14 +2087,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.FinalDrive = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Redline
 	-- =========================================================
@@ -2024,7 +2106,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2034,14 +2116,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.Redline = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Peak RPM
 	-- =========================================================
@@ -2053,7 +2135,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2063,14 +2145,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.PeakRPM = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Torque Curve Sharpness
 	-- =========================================================
@@ -2081,7 +2163,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2091,14 +2173,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.PeakSharpness = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Curve Multiplier  (overall torque output)
 	-- =========================================================
@@ -2109,7 +2191,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2119,14 +2201,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.CurveMult = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Gear Ratio Multiplier  (all gears scaled together)
 	-- =========================================================
@@ -2137,7 +2219,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2147,11 +2229,11 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
-
+	
 			local baseRatios = { 6.42, 0, 4.51, 2.38, 1.72, 1.2, 1, 0.9, 0.78 }
 			local newRatios = {}
 			for i, r in ipairs(baseRatios) do
@@ -2160,7 +2242,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			tune.Ratios = newRatios
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Front Brake Force
 	-- =========================================================
@@ -2171,7 +2253,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2181,14 +2263,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.FBrakeForce = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Rear Brake Force
 	-- =========================================================
@@ -2199,7 +2281,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2209,14 +2291,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.RBrakeForce = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Handbrake Force
 	-- =========================================================
@@ -2227,7 +2309,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2237,14 +2319,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.PBrakeForce = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Steering Max Torque
 	-- =========================================================
@@ -2255,7 +2337,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2265,14 +2347,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.SteerMaxTorque = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Steering Speed
 	-- =========================================================
@@ -2283,7 +2365,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2293,14 +2375,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.SteerSpeed = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Steering Angle
 	-- =========================================================
@@ -2311,7 +2393,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2321,7 +2403,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
@@ -2329,7 +2411,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			tune.SteerOuter = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Weight
 	-- =========================================================
@@ -2341,7 +2423,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2351,14 +2433,14 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.Weight = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Suspension Stiffness
 	-- =========================================================
@@ -2369,7 +2451,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2379,7 +2461,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
@@ -2387,7 +2469,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			tune.RSusStiffness = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Suspension Damping
 	-- =========================================================
@@ -2398,7 +2480,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2408,7 +2490,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
@@ -2416,7 +2498,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			tune.RSusDamping = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Suspension Length
 	-- =========================================================
@@ -2427,7 +2509,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2437,7 +2519,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
@@ -2445,7 +2527,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			tune.RSusLength = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Anti-Roll
 	-- =========================================================
@@ -2456,7 +2538,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2466,7 +2548,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
@@ -2474,7 +2556,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			tune.RAntiRoll = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Gyro Damping  (stability / grip)
 	-- =========================================================
@@ -2485,7 +2567,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2495,7 +2577,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
@@ -2503,7 +2585,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 			tune.RGyroDamp = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  Center of Gravity Height  (lower = less rollover)
 	-- =========================================================
@@ -2514,7 +2596,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 		Callback = function(v)
 			local Players     = game:GetService("Players")
 			local LocalPlayer = Players.LocalPlayer
-
+	
 			local function getPlayerCar(plrName)
 				local spelers = workspace:FindFirstChild("Spelers")
 				if not spelers then return nil end
@@ -2524,25 +2606,24 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
-
+	
 			local car = getPlayerCar(LocalPlayer.Name)
 			if not car or not car:FindFirstChild("A-Chassis Tune") then return end
 			local tune = require(car:FindFirstChild("A-Chassis Tune"))
 			tune.CGHeight = v
 		end,
 	})
-
+	
 	-- =========================================================
 	--  WAPEN
 	-- =========================================================
-
-
-
+	
+	
+	
 	-- Placeholder buttons that don't do anything yet
-
+	
 	-- =========================================================
 	--  Other menus — empty for now, just so the pages exist
 	-- =========================================================
-
 end
-coroutine.wrap(DJOXJ_fake_script)()
+coroutine.wrap(IQMVW_fake_script)()
