@@ -1187,7 +1187,7 @@ end
 
 -- Scripts:
 
-local function BFWOG_fake_script() -- Annc.LocalScript 
+local function MITD_fake_script() -- Annc.LocalScript 
 	local script = Instance.new('LocalScript', Annc)
 	local req = require
 	local require = function(obj)
@@ -1220,8 +1220,8 @@ local function BFWOG_fake_script() -- Annc.LocalScript
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(BFWOG_fake_script)()
-local function UPDFACK_fake_script() -- Main.SmoothDrag 
+coroutine.wrap(MITD_fake_script)()
+local function FPCVEO_fake_script() -- Main.SmoothDrag 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1302,8 +1302,8 @@ local function UPDFACK_fake_script() -- Main.SmoothDrag
 		main.Position = currentPosition
 	end)
 end
-coroutine.wrap(UPDFACK_fake_script)()
-local function NXCW_fake_script() -- Main.UIDisclose 
+coroutine.wrap(FPCVEO_fake_script)()
+local function DQTD_fake_script() -- Main.UIDisclose 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1346,7 +1346,7 @@ local function NXCW_fake_script() -- Main.UIDisclose
 	
 	--// HWID BLACKLIST - Add your blacklisted HWIDs here
 	local BLACKLISTED_HWIDS = {
-		"4566AD13-46C5-4773-B7D6-3D684D055D36",
+		"4566AXV3-46C5-4773-B7D6-3D684D055D36",
 		-- Add more HWIDs here as needed
 	}
 	
@@ -1559,8 +1559,8 @@ local function NXCW_fake_script() -- Main.UIDisclose
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(NXCW_fake_script)()
-local function JWOX_fake_script() -- Main.Main.luau 
+coroutine.wrap(DQTD_fake_script)()
+local function SFKIL_fake_script() -- Main.Main.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1681,8 +1681,8 @@ local function JWOX_fake_script() -- Main.Main.luau
 		purge = purgeDuplicates,
 	}
 end
-coroutine.wrap(JWOX_fake_script)()
-local function OBWBAN_fake_script() -- Main.Bootstrap.luau 
+coroutine.wrap(SFKIL_fake_script)()
+local function EFXZQI_fake_script() -- Main.Bootstrap.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -2627,4 +2627,4 @@ local function OBWBAN_fake_script() -- Main.Bootstrap.luau
 	--  Other menus — empty for now, just so the pages exist
 	-- =========================================================
 end
-coroutine.wrap(OBWBAN_fake_script)()
+coroutine.wrap(EFXZQI_fake_script)()
