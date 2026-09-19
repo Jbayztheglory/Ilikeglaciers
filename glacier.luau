@@ -1754,7 +1754,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -1867,7 +1867,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2001,7 +2001,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2030,7 +2030,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2059,7 +2059,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2087,7 +2087,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2115,7 +2115,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2143,7 +2143,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2177,7 +2177,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2205,7 +2205,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2233,7 +2233,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2261,7 +2261,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2289,7 +2289,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2317,7 +2317,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2347,7 +2347,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2375,7 +2375,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2404,7 +2404,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2433,7 +2433,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2462,7 +2462,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2491,7 +2491,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
@@ -2520,7 +2520,7 @@ local function DJOXJ_fake_script() -- Main.Bootstrap.luau
 				if not spelers then return nil end
 				local plrFolder = spelers:FindFirstChild(plrName)
 				if not plrFolder then return nil end
-				local autoFolder = plrFolder:FindFirstChild("Auto")
+				local autoFolder = plrFolder:FindFirstChild("Voertuig")
 				if not autoFolder then return nil end
 				return autoFolder:GetChildren()[1]
 			end
