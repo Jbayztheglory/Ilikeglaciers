@@ -1187,7 +1187,7 @@ end
 
 -- Scripts:
 
-local function TEAFBS_fake_script() -- Annc.LocalScript 
+local function TZQFK_fake_script() -- Annc.LocalScript 
 	local script = Instance.new('LocalScript', Annc)
 	local req = require
 	local require = function(obj)
@@ -1220,8 +1220,8 @@ local function TEAFBS_fake_script() -- Annc.LocalScript
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(TEAFBS_fake_script)()
-local function DKCT_fake_script() -- Main.SmoothDrag 
+coroutine.wrap(TZQFK_fake_script)()
+local function LFUZAA_fake_script() -- Main.SmoothDrag 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1302,8 +1302,8 @@ local function DKCT_fake_script() -- Main.SmoothDrag
 		main.Position = currentPosition
 	end)
 end
-coroutine.wrap(DKCT_fake_script)()
-local function LFAWNI_fake_script() -- Main.UIDisclose 
+coroutine.wrap(LFUZAA_fake_script)()
+local function XPEKEKM_fake_script() -- Main.UIDisclose 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1434,7 +1434,6 @@ local function LFAWNI_fake_script() -- Main.UIDisclose
 					end
 	
 					-- Destroy the UI after a delay
-					task.wait(2)
 				    script.Parent.Parent:Destroy()
 					return
 				end
@@ -1558,8 +1557,8 @@ local function LFAWNI_fake_script() -- Main.UIDisclose
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(LFAWNI_fake_script)()
-local function WMUSL_fake_script() -- Main.Main.luau 
+coroutine.wrap(XPEKEKM_fake_script)()
+local function WGAFVQJ_fake_script() -- Main.Main.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1680,8 +1679,8 @@ local function WMUSL_fake_script() -- Main.Main.luau
 		purge = purgeDuplicates,
 	}
 end
-coroutine.wrap(WMUSL_fake_script)()
-local function KOBD_fake_script() -- Main.Bootstrap.luau 
+coroutine.wrap(WGAFVQJ_fake_script)()
+local function PFQU_fake_script() -- Main.Bootstrap.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -2626,4 +2625,4 @@ local function KOBD_fake_script() -- Main.Bootstrap.luau
 	--  Other menus — empty for now, just so the pages exist
 	-- =========================================================
 end
-coroutine.wrap(KOBD_fake_script)()
+coroutine.wrap(PFQU_fake_script)()
