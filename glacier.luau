@@ -1187,7 +1187,7 @@ end
 
 -- Scripts:
 
-local function LJAWUQ_fake_script() -- Annc.LocalScript 
+local function XBEMN_fake_script() -- Annc.LocalScript 
 	local script = Instance.new('LocalScript', Annc)
 	local req = require
 	local require = function(obj)
@@ -1220,8 +1220,8 @@ local function LJAWUQ_fake_script() -- Annc.LocalScript
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(LJAWUQ_fake_script)()
-local function ZTSNCR_fake_script() -- Main.SmoothDrag 
+coroutine.wrap(XBEMN_fake_script)()
+local function NDIDDE_fake_script() -- Main.SmoothDrag 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1302,8 +1302,8 @@ local function ZTSNCR_fake_script() -- Main.SmoothDrag
 		main.Position = currentPosition
 	end)
 end
-coroutine.wrap(ZTSNCR_fake_script)()
-local function CMJZVNT_fake_script() -- Main.UIDisclose 
+coroutine.wrap(NDIDDE_fake_script)()
+local function CCDPO_fake_script() -- Main.UIDisclose 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1558,8 +1558,8 @@ local function CMJZVNT_fake_script() -- Main.UIDisclose
 	
 	textLabel.TextTransparency = 0
 end
-coroutine.wrap(CMJZVNT_fake_script)()
-local function JUGU_fake_script() -- Main.Main.luau 
+coroutine.wrap(CCDPO_fake_script)()
+local function JLJJ_fake_script() -- Main.Main.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1680,8 +1680,8 @@ local function JUGU_fake_script() -- Main.Main.luau
 		purge = purgeDuplicates,
 	}
 end
-coroutine.wrap(JUGU_fake_script)()
-local function DEMTGFO_fake_script() -- Main.Bootstrap.luau 
+coroutine.wrap(JLJJ_fake_script)()
+local function AEAWUC_fake_script() -- Main.Bootstrap.luau 
 	local script = Instance.new('LocalScript', Main)
 	local req = require
 	local require = function(obj)
@@ -1706,6 +1706,7 @@ local function DEMTGFO_fake_script() -- Main.Bootstrap.luau
 	Manager:CreateMenus({
 		"Speler",
 		"Apeldoorn",
+		"OG FiveR",
 		"Wapen",
 		"Voertuig",
 		"Visueel",
@@ -2007,6 +2008,120 @@ local function DEMTGFO_fake_script() -- Main.Bootstrap.luau
 		end,
 	})
 	
+	
+	-- ============================== OG FIVER ===================================
+	
+	local sirenTask = nil
+	
+	Manager:CreateToggle({
+		Menu = "OG FiveR",
+		Name = "Sirene spam",
+		Default = false,
+		Callback = function(state)
+			if state then
+				sirenTask = task.spawn(function()
+					while true do
+						for _, descendant in ipairs(workspace:GetDescendants()) do
+							if descendant.Name == "EventLightbar" and descendant:IsA("RemoteEvent") then
+								pcall(function()
+									descendant:FireServer("Siren")
+								end)
+							end
+						end
+						task.wait(0.1)
+					end
+				end)
+			else
+				if sirenTask then
+					task.cancel(sirenTask)
+					sirenTask = nil
+				end
+			end
+		end,
+	})
+	
+	Manager:CreateButton({
+		Menu = "OG FiveR",
+		Name = "Wapens spawnen",
+		Callback = function()
+			function recurse(instance)
+				if instance:IsA("Tool") or instance:IsA("HopperBin") then
+					if workspace.FilteringEnabled == false then
+						c = instance:Clone()
+						c.Parent = game.Players.LocalPlayer.Backpack
+					else
+						instance.Parent = game.Players.LocalPlayer.Backpack
+					end
+				end
+				for _, child in ipairs(instance:GetChildren()) do
+					recurse(child)
+				end
+			end
+			recurse(game)
+		end,
+	})
+	
+	Manager:CreateButton({
+		Menu = "OG FiveR",
+		Name = "Respawnen",
+		Callback = function()
+			local replicatedStorage = game:GetService("ReplicatedStorage")
+			local localPlayer = game.Players.LocalPlayer
+	
+			pcall(function()
+				local lifepakFolder = replicatedStorage:WaitForChild("Lifepak")
+				local doodFolder = replicatedStorage:WaitForChild("Dood")
+				local antiExploitEvent = lifepakFolder:WaitForChild("Antiexploit")
+				local doodEvent = doodFolder:WaitForChild("Dood")
+				antiExploitEvent:FireServer(localPlayer)
+				doodEvent:FireServer(localPlayer)
+			end)
+		end,
+	})
+	
+	-- Always provide the full script
+	
+	local ambuTask = nil
+	
+	Manager:CreateToggle({
+		Menu = "OG FiveR",
+		Name = "Ambu melding spam",
+		Default = false,
+		Callback = function(state)
+			if state then
+				ambuTask = task.spawn(function()
+					while true do
+						local Event = game:GetService("ReplicatedStorage").Locatietrigger.AmbuMeldingEvent
+						local localPlayer = game.Players.LocalPlayer
+						local targetPlayer = nil
+	
+						for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+							if player ~= localPlayer then
+								targetPlayer = player
+								break
+							end
+						end
+	
+						if targetPlayer and workspace:FindFirstChild("Locaties ") and workspace["Locaties "]:FindFirstChild("CARDEALER") then
+							pcall(function()
+								Event:FireServer(
+									workspace["Locaties "].CARDEALER,
+									targetPlayer
+								)
+							end)
+						end
+	
+						task.wait(1)
+					end
+				end)
+			else
+				if ambuTask then
+					task.cancel(ambuTask)
+					ambuTask = nil
+				end
+			end
+		end,
+	})
 	
 	-- ============================== Voertuig ====================================
 	-- =========================================================
@@ -2606,4 +2721,4 @@ local function DEMTGFO_fake_script() -- Main.Bootstrap.luau
 		end,
 	})
 end
-coroutine.wrap(DEMTGFO_fake_script)()
+coroutine.wrap(AEAWUC_fake_script)()
